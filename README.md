@@ -3,7 +3,7 @@ Project is an exploration project for c++. It implements mathematical syntax eva
 ## How to use
 
 - Clone
-- Init CMake `cmake -S . -B ./build/release -DCMAKE_BUILD_TYPE=Release`
+- Init CMake `cmake -S . -B ./build/release -DCMAKE_BUILD_TYPE=Release && cmake -S . -B ./build/debug -DCMAKE_BUILD_TYPE=Debug`
 - Build `cmake --build ./build/release`
 - Run `./build/release/main`
 
