@@ -429,7 +429,7 @@ std::expected<sxm::PEvalNode *, sxm::ParserError> sxm::eval_pure_build(const cha
                 const auto target_parent = static_cast<sxm::PEvalNodeBiOp *>(target->parent);
                 const unsigned short target_parent_priority = biop_priority_let(target_parent->operation);
 
-                if (target_parent_priority > biop_priority) {
+                if (target_parent_priority >= biop_priority) {
                     target = target_parent;
                 } else {
                     break;
