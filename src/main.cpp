@@ -7,12 +7,14 @@
 #include <iostream>
 #include <math.h>
 #include <string>
+#include "sxm/cmd/perfsm.hpp"
 #include "sxm/debug/print_ast.hpp"
 #include "sxm/debug/valid_let.hpp"
 #include "sxm/cmd/tkn.hpp"
 #include "sxm/cmd/tree.hpp"
 #include "sxm/cmd/eval_pure.hpp"
 #include "sxm/cmd/eval_flat.hpp"
+#include "sxm/cmd/eval_compile.hpp"
 #include "sxm/cmd/eval_linked.hpp"
 #include <charconv>
 
@@ -21,10 +23,12 @@ int main() {
     static constexpr std::string_view cmd_tkn = ":tkn ";
     static constexpr std::string_view cmd_tree = ":tree ";
     static constexpr std::string_view cmd_perf = ":perf ";
+    static constexpr std::string_view cmd_perfsm = ":perfsm ";
     static constexpr std::string_view cmd_perf_safe = ":perf_safe ";
     static constexpr std::string_view cmd_linked = ":el ";
     static constexpr std::string_view cmd_flat = ":ef ";
     static constexpr std::string_view cmd_pure = ":ep ";
+    static constexpr std::string_view cmd_compile = ":ec ";
 
     static HMapStatic<255, sxm::NumValue> val_hmap {};
 
@@ -62,6 +66,48 @@ int main() {
             } else {
                 std::printf("size should be >= 1\n");
             }
+        } else if (line.starts_with(cmd_perfsm)) {
+            const char *src = line.c_str() + cmd_perfsm.size();
+            double size;
+            double repeats;
+
+            const char *delim_end;
+            const char *delim_idx {};
+
+            for (const char *arg_now = src;;) {
+                if (*arg_now == '\0') {
+                    delim_end = arg_now;
+
+                    break;
+                }
+
+                if (*arg_now == '*') {
+                    delim_idx = arg_now;
+                }
+
+                ++arg_now;
+            }
+
+            if (delim_idx == nullptr) {
+                std::printf("Bad argument format. Expected {token_size}*{repeats}\n");
+
+                return 1;
+            }
+
+            auto parser_amount = std::from_chars(src, delim_idx, size);
+            auto parser_ratio = std::from_chars(delim_idx + 1, delim_end, repeats);
+
+            if (parser_amount.ec != std::errc {} || parser_ratio.ec != std::errc {}) {
+                if (delim_idx == nullptr) {
+                    std::printf("Bad argument format. Expected {token_size}*{repeats}\n");
+
+                    return 1;
+                }
+            }
+
+            std::printf("size: %lu repeats: %lu\n", static_cast<std::size_t>(size), static_cast<std::size_t>(repeats));
+
+            sxm::cmd::perfsm(size, repeats);
         } else if (line.starts_with(cmd_tkn)) {
             sxm::cmd::tkn(line.c_str() + cmd_tkn.size());
         } else if (line.starts_with(cmd_tree)) {
@@ -72,6 +118,8 @@ int main() {
             sxm::cmd::eval_pure(line.c_str() + cmd_pure.size(), &val_hmap);
         } else if (line.starts_with(cmd_flat)) {
             sxm::cmd::eval_flat(line.c_str() + cmd_flat.size(), &val_hmap);
+        } else if (line.starts_with(cmd_compile)) {
+            sxm::cmd::eval_compile(line.c_str() + cmd_flat.size(), &val_hmap);
         } else {
             sxm::cmd::eval_flat(line.c_str(), &val_hmap);
         }

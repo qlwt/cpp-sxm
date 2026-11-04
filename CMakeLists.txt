@@ -28,6 +28,7 @@ add_executable(main
     src/sxm/cmd/tkn.cpp
     src/sxm/cmd/tree.cpp
     src/sxm/cmd/perf.cpp
+    src/sxm/cmd/perfsm.cpp
     src/sxm/cmd/eval_pure.cpp
     src/sxm/cmd/eval_flat.cpp
     src/sxm/cmd/eval_linked.cpp

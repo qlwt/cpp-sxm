@@ -127,10 +127,11 @@ std::string expr_new(std::size_t length) {
     return expr;
 }
 
-std::size_t exec(std::function<void(const char *, HMap<sxm::NumValue> *)> cb, const char *src, HMap<sxm::NumValue> *val_hmap) {
+template <typename T>
+std::size_t exec(T cb) {
     auto start = std::chrono::steady_clock::now();
 
-    cb(src, val_hmap);
+    cb();
 
     auto end = std::chrono::steady_clock::now();
 
@@ -150,10 +151,11 @@ void sxm::cmd::perf(std::size_t size, bool flag_safe) {
     std::size_t parse_duration;
 
     {
-
         std::printf("parse::start tokens_size=%lu\n", expr_parse.size());
 
-        parse_duration = exec([](const char *src, HMap<sxm::NumValue> *) -> void {
+        parse_duration = exec([&]() -> void {
+            const char *src = expr_parse.c_str();
+
             for (auto token : sxm::parse(src)) {
                 if (!token.has_value()) {
                     sxm::print_err_parser(token.error(), src);
@@ -161,7 +163,7 @@ void sxm::cmd::perf(std::size_t size, bool flag_safe) {
                     break;
                 }
             }
-        }, expr_parse.c_str(), nullptr);
+        });
 
         std::printf("parse::done duration=%f\n", (double)parse_duration / 1e6);
         std::printf("\n");
@@ -172,24 +174,28 @@ void sxm::cmd::perf(std::size_t size, bool flag_safe) {
 
         std::printf("eval_pure::start tokens_size=%lu\n", expr_pure.size());
 
-        std::size_t lduration = exec([](const char *src, HMap<sxm::NumValue> *val_hmap) -> void {
+        std::size_t lduration = exec([&]() -> void {
+            const char *src = expr_pure.c_str();
             std::expected<sxm::PEvalNode *, sxm::ParserError> ast = sxm::eval_pure_build(src);
 
             if (!ast.has_value()) {
                 sxm::print_err_parser(ast.error(), src);
             } else {
+                std::size_t lduration_eval = exec([&]() -> void {
+                    std::expected<sxm::NumValue, sxm::EvalError> result = sxm::eval_pure(ast.value(), &val_hmap);
 
-                std::expected<sxm::NumValue, sxm::EvalError> result = sxm::eval_pure(ast.value(), val_hmap);
+                    if (!result.has_value()) {
+                        sxm::print_err_eval(result.error());
+                    } else {
+                        printf("Value is %f\n", result->real);
+                    }
+                });
+
+                std::printf("eval_pure::calc %.12f\n", (double)lduration_eval / 1e6);
 
                 delete ast.value();
-
-                if (!result.has_value()) {
-                    sxm::print_err_eval(result.error());
-                } else {
-                    printf("Value is %f\n", result->real);
-                }
             }
-        }, expr_pure.c_str(), &val_hmap);
+        });
 
         std::printf("eval_pure::done %f\n", (double)lduration / 1e6);
         std::printf("eval_pure::done::noparse %f\n", (double)(lduration - parse_duration) / 1e6);
@@ -201,12 +207,12 @@ void sxm::cmd::perf(std::size_t size, bool flag_safe) {
 
         std::printf("eval_flat::start tokens_size=%lu\n", expr_flat.size());
 
-        std::size_t lduration = exec([](const char *src, HMap<sxm::NumValue> *val_hmap) -> void {
-
-            std::expected<sxm::NumValue, sxm::FEvalError> result = sxm::eval_flat(src, val_hmap);
+        std::size_t lduration = exec([&]() -> void {
+            const char *src = expr_flat.c_str();
+            std::expected<sxm::NumValue, sxm::FEvalError> result = sxm::eval_flat(src, &val_hmap);
 
             if (!result.has_value()) {
-                std::visit([src](const auto &error) {
+                std::visit([src](const auto & error) {
                     using T = std::decay_t<decltype(error)>;
 
                     if constexpr (std::is_same_v<T, sxm::ParserError>) {
@@ -218,7 +224,7 @@ void sxm::cmd::perf(std::size_t size, bool flag_safe) {
             } else {
                 printf("Value is %f\n", result->real);
             }
-        }, expr_flat.c_str(), &val_hmap);
+        });
 
         std::printf("eval_flat::done %f\n", (double)lduration / 1e6);
         std::printf("eval_flat::done::noparse %f\n", (double)(lduration - parse_duration) / 1e6);
@@ -229,11 +235,12 @@ void sxm::cmd::perf(std::size_t size, bool flag_safe) {
         HMapStatic<10, sxm::NumValue> val_hmap {};
         std::printf("eval_linked::start tokens_size=%lu\n", expr_linked.size());
 
-        std::size_t lduration = exec([](const char *src, HMap<sxm::NumValue> *val_hmap) -> void {
-            std::expected<sxm::NumValue, sxm::FEvalError> result = sxm::eval_linked(src, val_hmap);
+        std::size_t lduration = exec([&]() -> void {
+            const char *src = expr_linked.c_str();
+            std::expected<sxm::NumValue, sxm::FEvalError> result = sxm::eval_linked(src, &val_hmap);
 
             if (!result.has_value()) {
-                std::visit([src](const auto &error) {
+                std::visit([src](const auto & error) {
                     using T = std::decay_t<decltype(error)>;
 
                     if constexpr (std::is_same_v<T, sxm::ParserError>) {
@@ -245,7 +252,7 @@ void sxm::cmd::perf(std::size_t size, bool flag_safe) {
             } else {
                 printf("Value is %f\n", result->real);
             }
-        }, expr_linked.c_str(), &val_hmap);
+        });
 
         std::printf("eval_linked::done %f\n", (double)lduration / 1e6);
         std::printf("eval_linked::done::noparse %f\n", (double)(lduration - parse_duration) / 1e6);
