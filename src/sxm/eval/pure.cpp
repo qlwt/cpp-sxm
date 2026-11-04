@@ -374,7 +374,7 @@ std::expected<sxm::PEvalNode *, sxm::ParserError> sxm::eval_pure_build(const cha
 
                         if (data_before != data_now) {
                             // last element is uninitialised
-                            sxm::PEvalNode **data_end = data_now + node_fn->arg_list.size() -1;
+                            sxm::PEvalNode **data_end = data_now + node_fn->arg_list.size() - 1;
 
                             for (; data_now < data_end; ++data_now) {
                                 (*data_now)->slot = data_now;
@@ -505,31 +505,31 @@ std::expected<const sxm::NumValue, sxm::EvalError> sxm::eval_pure(sxm::PEvalNode
                 break;
             }
             case sxm::ASTNode_Kind::Fn: {
-                auto nodefn = static_cast<sxm::PEvalNodeFn *>(snode->ast);
-                auto nodefn_numfn_o = fn_hmap.find(nodefn->name);
+                auto lnode = static_cast<sxm::PEvalNodeFn *>(snode->ast);
+                auto lnode_fndef = sxm::numfn::hmap.find(lnode->name);
 
-                if (!nodefn_numfn_o.has_value()) {
+                if (!lnode_fndef.has_value()) {
                     return std::unexpected {
                         sxm::EvalError {
                             sxm::EvalError_Kind::FnUndef,
-                            "Undefined Function " + std::string { nodefn->name.p_start, nodefn->name.p_end }
+                            "Undefined Function " + std::string { lnode->name.p_start, lnode->name.p_end }
                         },
                     };
                 }
 
-                auto nodefn_numfn = nodefn_numfn_o.value();
-                auto next_o = nodefn_numfn({ snode->value_list, snode->value_list + nodefn->arg_list.size() });
-
-                if (!next_o.has_value()) {
+                if (!lnode_fndef->validator(lnode->arg_list.size())) {
                     return std::unexpected {
                         sxm::EvalError {
                             sxm::EvalError_Kind::FnEval,
-                            "Function Evaluation Error in Function " + std::string { nodefn->name.p_start, nodefn->name.p_end }
+                            "Function Evaluation Error in Function " + std::string { lnode->name.p_start, lnode->name.p_end }
                         },
                     };
                 }
 
-                *snode->output = next_o.value();
+                *snode->output = lnode_fndef.value().fn_raw({
+                    snode->value_list,
+                    snode->value_list + lnode->arg_list.size()
+                });
 
                 break;
             }

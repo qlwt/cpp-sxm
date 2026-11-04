@@ -3,128 +3,113 @@
 #include "sxm/eval/flat.hpp"
 #include "sxm/eval/linked.hpp"
 #include "sxm/ast/numvalue.hpp"
-#include <optional>
+#include <cstddef>
 
 #pragma once
 
-namespace sxm {
+namespace sxm::numfn {
 
-using NumFn = std::optional<sxm::NumValue> (*)(Range<sxm::NumValue> arg_list);
-using NumFnFEval = std::optional<sxm::NumValue> (*)(Range<sxm::FEvalNodeNum *> arg_list);
-using NumFnLEval = std::optional<sxm::NumValue> (*)(Range<sxm::LEvalNodeNum *> arg_list);
+using Validator = bool (*)(std::size_t arg_size);
+using FnRaw = sxm::NumValue (*)(Range<sxm::NumValue> arg_list);
+using FnFEval = sxm::NumValue (*)(Range<sxm::FEvalNodeNum *> arg_list);
+using FnLEval = sxm::NumValue (*)(Range<sxm::LEvalNodeNum *> arg_list);
 
-namespace numfn {
-
-std::optional<sxm::NumValue> toint(Range<sxm::NumValue> arg_list);
-std::optional<sxm::NumValue> feval_toint(Range<sxm::FEvalNodeNum *> arg_list);
-std::optional<sxm::NumValue> leval_toint(Range<sxm::LEvalNodeNum *> arg_list);
-
-std::optional<sxm::NumValue> bif(Range<sxm::NumValue> arg_list);
-std::optional<sxm::NumValue> feval_bif(Range<sxm::FEvalNodeNum *> arg_list);
-std::optional<sxm::NumValue> leval_bif(Range<sxm::LEvalNodeNum *> arg_list);
-std::optional<sxm::NumValue> bife(Range<sxm::NumValue> arg_list);
-std::optional<sxm::NumValue> feval_bife(Range<sxm::FEvalNodeNum *> arg_list);
-std::optional<sxm::NumValue> leval_bife(Range<sxm::LEvalNodeNum *> arg_list);
-
-std::optional<sxm::NumValue> sin(Range<sxm::NumValue> arg_list);
-std::optional<sxm::NumValue> feval_sin(Range<sxm::FEvalNodeNum *> arg_list);
-std::optional<sxm::NumValue> leval_sin(Range<sxm::LEvalNodeNum *> arg_list);
-std::optional<sxm::NumValue> cos(Range<sxm::NumValue> arg_list);
-std::optional<sxm::NumValue> feval_cos(Range<sxm::FEvalNodeNum *> arg_list);
-std::optional<sxm::NumValue> leval_cos(Range<sxm::LEvalNodeNum *> arg_list);
-std::optional<sxm::NumValue> tan(Range<sxm::NumValue> arg_list);
-std::optional<sxm::NumValue> feval_tan(Range<sxm::FEvalNodeNum *> arg_list);
-std::optional<sxm::NumValue> leval_tan(Range<sxm::LEvalNodeNum *> arg_list);
-std::optional<sxm::NumValue> ctan(Range<sxm::NumValue> arg_list);
-std::optional<sxm::NumValue> feval_ctan(Range<sxm::FEvalNodeNum *> arg_list);
-std::optional<sxm::NumValue> leval_ctan(Range<sxm::LEvalNodeNum *> arg_list);
-
-std::optional<sxm::NumValue> ln(Range<sxm::NumValue> arg_list);
-std::optional<sxm::NumValue> feval_ln(Range<sxm::FEvalNodeNum *> arg_list);
-std::optional<sxm::NumValue> leval_ln(Range<sxm::LEvalNodeNum *> arg_list);
-std::optional<sxm::NumValue> log(Range<sxm::NumValue> arg_list);
-std::optional<sxm::NumValue> feval_log(Range<sxm::FEvalNodeNum *> arg_list);
-std::optional<sxm::NumValue> leval_log(Range<sxm::LEvalNodeNum *> arg_list);
-std::optional<sxm::NumValue> log2(Range<sxm::NumValue> arg_list);
-std::optional<sxm::NumValue> feval_log2(Range<sxm::FEvalNodeNum *> arg_list);
-std::optional<sxm::NumValue> leval_log2(Range<sxm::LEvalNodeNum *> arg_list);
-std::optional<sxm::NumValue> log10(Range<sxm::NumValue> arg_list);
-std::optional<sxm::NumValue> feval_log10(Range<sxm::FEvalNodeNum *> arg_list);
-std::optional<sxm::NumValue> leval_log10(Range<sxm::LEvalNodeNum *> arg_list);
-
-std::optional<sxm::NumValue> toreal(Range<sxm::NumValue> arg_list);
-std::optional<sxm::NumValue> feval_toreal(Range<sxm::FEvalNodeNum *> arg_list);
-std::optional<sxm::NumValue> leval_toreal(Range<sxm::LEvalNodeNum *> arg_list);
-
-std::optional<sxm::NumValue> b(Range<sxm::NumValue> arg_list);
-std::optional<sxm::NumValue> feval_b(Range<sxm::FEvalNodeNum *> arg_list);
-std::optional<sxm::NumValue> leval_b(Range<sxm::LEvalNodeNum *> arg_list);
-
-}
-
-constexpr HMapConst<64, 15, sxm::NumFn> fn_hmap {
-    std::array<HMapConst_HNode<sxm::NumFn>, 15> {
-        HMapConst_HNode<sxm::NumFn>{ Range<const char>{ "b" }, sxm::numfn::b },
-
-        HMapConst_HNode<sxm::NumFn>{ Range<const char>{ "int" }, sxm::numfn::toint },
-        HMapConst_HNode<sxm::NumFn>{ Range<const char>{ "real" }, sxm::numfn::toreal },
-
-        HMapConst_HNode<sxm::NumFn>{ Range<const char>{ "if" }, sxm::numfn::bif },
-        HMapConst_HNode<sxm::NumFn>{ Range<const char>{ "ife" }, sxm::numfn::bife },
-
-        HMapConst_HNode<sxm::NumFn>{ Range<const char>{ "sin" }, sxm::numfn::sin },
-        HMapConst_HNode<sxm::NumFn>{ Range<const char>{ "cos" }, sxm::numfn::cos },
-        HMapConst_HNode<sxm::NumFn>{ Range<const char>{ "tan" }, sxm::numfn::tan },
-        HMapConst_HNode<sxm::NumFn>{ Range<const char>{ "ctan" }, sxm::numfn::ctan },
-
-        HMapConst_HNode<sxm::NumFn>{ Range<const char>{ "ln" }, sxm::numfn::ln },
-        HMapConst_HNode<sxm::NumFn>{ Range<const char>{ "log" }, sxm::numfn::log },
-        HMapConst_HNode<sxm::NumFn>{ Range<const char>{ "log2" }, sxm::numfn::log2 },
-        HMapConst_HNode<sxm::NumFn>{ Range<const char>{ "log10" }, sxm::numfn::log10 },
-    }
+struct Def {
+    FnRaw fn_raw;
+    FnFEval fn_feval;
+    FnLEval fn_leval;
+    Validator validator;
 };
 
-constexpr HMapConst<64, 15, sxm::NumFnFEval> fn_hmap_feval {
-    std::array<HMapConst_HNode<sxm::NumFnFEval>, 15> {
-        HMapConst_HNode<sxm::NumFnFEval>{ Range<const char>{ "b" }, sxm::numfn::feval_b },
+sxm::NumValue int_fn_raw(Range<sxm::NumValue> arg_list);
+sxm::NumValue int_fn_feval(Range<sxm::FEvalNodeNum *> arg_list);
+sxm::NumValue int_fn_leval(Range<sxm::LEvalNodeNum *> arg_list);
+bool int_validator(std::size_t arg_size);
+constexpr Def int_def { int_fn_raw, int_fn_feval, int_fn_leval, int_validator, };
 
-        HMapConst_HNode<sxm::NumFnFEval>{ Range<const char>{ "int" }, sxm::numfn::feval_toint },
-        HMapConst_HNode<sxm::NumFnFEval>{ Range<const char>{ "real" }, sxm::numfn::feval_toreal },
+sxm::NumValue if_fn_raw(Range<sxm::NumValue> arg_list);
+sxm::NumValue if_fn_feval(Range<sxm::FEvalNodeNum *> arg_list);
+sxm::NumValue if_fn_leval(Range<sxm::LEvalNodeNum *> arg_list);
+bool if_validator(std::size_t arg_size);
+constexpr Def if_def { if_fn_raw, if_fn_feval, if_fn_leval, if_validator, };
 
-        HMapConst_HNode<sxm::NumFnFEval>{ Range<const char>{ "if" }, sxm::numfn::feval_bif },
-        HMapConst_HNode<sxm::NumFnFEval>{ Range<const char>{ "ife" }, sxm::numfn::feval_bife },
+sxm::NumValue ife_fn_raw(Range<sxm::NumValue> arg_list);
+sxm::NumValue ife_fn_feval(Range<sxm::FEvalNodeNum *> arg_list);
+sxm::NumValue ife_fn_leval(Range<sxm::LEvalNodeNum *> arg_list);
+bool ife_validator(std::size_t arg_size);
+constexpr Def ife_def { ife_fn_raw, ife_fn_feval, ife_fn_leval, ife_validator, };
 
-        HMapConst_HNode<sxm::NumFnFEval>{ Range<const char>{ "sin" }, sxm::numfn::feval_sin },
-        HMapConst_HNode<sxm::NumFnFEval>{ Range<const char>{ "cos" }, sxm::numfn::feval_cos },
-        HMapConst_HNode<sxm::NumFnFEval>{ Range<const char>{ "tan" }, sxm::numfn::feval_tan },
-        HMapConst_HNode<sxm::NumFnFEval>{ Range<const char>{ "ctan" }, sxm::numfn::feval_ctan },
+sxm::NumValue sin_fn_raw(Range<sxm::NumValue> arg_list);
+sxm::NumValue sin_fn_feval(Range<sxm::FEvalNodeNum *> arg_list);
+sxm::NumValue sin_fn_leval(Range<sxm::LEvalNodeNum *> arg_list);
+bool sin_validator(std::size_t arg_size);
+constexpr Def sin_def { sin_fn_raw, sin_fn_feval, sin_fn_leval, sin_validator, };
 
-        HMapConst_HNode<sxm::NumFnFEval>{ Range<const char>{ "ln" }, sxm::numfn::feval_ln },
-        HMapConst_HNode<sxm::NumFnFEval>{ Range<const char>{ "log" }, sxm::numfn::feval_log },
-        HMapConst_HNode<sxm::NumFnFEval>{ Range<const char>{ "log2" }, sxm::numfn::feval_log2 },
-        HMapConst_HNode<sxm::NumFnFEval>{ Range<const char>{ "log10" }, sxm::numfn::feval_log10 },
-    }
-};
+sxm::NumValue cos_fn_raw(Range<sxm::NumValue> arg_list);
+sxm::NumValue cos_fn_feval(Range<sxm::FEvalNodeNum *> arg_list);
+sxm::NumValue cos_fn_leval(Range<sxm::LEvalNodeNum *> arg_list);
+bool cos_validator(std::size_t arg_size);
+constexpr Def cos_def { cos_fn_raw, cos_fn_feval, cos_fn_leval, cos_validator, };
 
-constexpr HMapConst<64, 15, sxm::NumFnLEval> fn_hmap_leval {
-    std::array<HMapConst_HNode<sxm::NumFnLEval>, 15> {
-        HMapConst_HNode<sxm::NumFnLEval>{ Range<const char>{ "b" }, sxm::numfn::leval_b },
+sxm::NumValue tan_fn_raw(Range<sxm::NumValue> arg_list);
+sxm::NumValue tan_fn_feval(Range<sxm::FEvalNodeNum *> arg_list);
+sxm::NumValue tan_fn_leval(Range<sxm::LEvalNodeNum *> arg_list);
+bool tan_validator(std::size_t arg_size);
+constexpr Def tan_def { tan_fn_raw, tan_fn_feval, tan_fn_leval, tan_validator, };
 
-        HMapConst_HNode<sxm::NumFnLEval>{ Range<const char>{ "int" }, sxm::numfn::leval_toint },
-        HMapConst_HNode<sxm::NumFnLEval>{ Range<const char>{ "real" }, sxm::numfn::leval_toreal },
+sxm::NumValue ctan_fn_raw(Range<sxm::NumValue> arg_list);
+sxm::NumValue ctan_fn_feval(Range<sxm::FEvalNodeNum *> arg_list);
+sxm::NumValue ctan_fn_leval(Range<sxm::LEvalNodeNum *> arg_list);
+bool ctan_validator(std::size_t arg_size);
+constexpr Def ctan_def { ctan_fn_raw, ctan_fn_feval, ctan_fn_leval, ctan_validator, };
 
-        HMapConst_HNode<sxm::NumFnLEval>{ Range<const char>{ "if" }, sxm::numfn::leval_bif },
-        HMapConst_HNode<sxm::NumFnLEval>{ Range<const char>{ "ife" }, sxm::numfn::leval_bife },
+sxm::NumValue ln_fn_raw(Range<sxm::NumValue> arg_list);
+sxm::NumValue ln_fn_feval(Range<sxm::FEvalNodeNum *> arg_list);
+sxm::NumValue ln_fn_leval(Range<sxm::LEvalNodeNum *> arg_list);
+bool ln_validator(std::size_t arg_size);
+constexpr Def ln_def { ln_fn_raw, ln_fn_feval, ln_fn_leval, ln_validator, };
 
-        HMapConst_HNode<sxm::NumFnLEval>{ Range<const char>{ "sin" }, sxm::numfn::leval_sin },
-        HMapConst_HNode<sxm::NumFnLEval>{ Range<const char>{ "cos" }, sxm::numfn::leval_cos },
-        HMapConst_HNode<sxm::NumFnLEval>{ Range<const char>{ "tan" }, sxm::numfn::leval_tan },
-        HMapConst_HNode<sxm::NumFnLEval>{ Range<const char>{ "ctan" }, sxm::numfn::leval_ctan },
+sxm::NumValue log_fn_raw(Range<sxm::NumValue> arg_list);
+sxm::NumValue log_fn_feval(Range<sxm::FEvalNodeNum *> arg_list);
+sxm::NumValue log_fn_leval(Range<sxm::LEvalNodeNum *> arg_list);
+bool log_validator(std::size_t arg_size);
+constexpr Def log_def { log_fn_raw, log_fn_feval, log_fn_leval, log_validator, };
 
-        HMapConst_HNode<sxm::NumFnLEval>{ Range<const char>{ "ln" }, sxm::numfn::leval_ln },
-        HMapConst_HNode<sxm::NumFnLEval>{ Range<const char>{ "log" }, sxm::numfn::leval_log },
-        HMapConst_HNode<sxm::NumFnLEval>{ Range<const char>{ "log2" }, sxm::numfn::leval_log2 },
-        HMapConst_HNode<sxm::NumFnLEval>{ Range<const char>{ "log10" }, sxm::numfn::leval_log10 },
+sxm::NumValue log2_fn_raw(Range<sxm::NumValue> arg_list);
+sxm::NumValue log2_fn_feval(Range<sxm::FEvalNodeNum *> arg_list);
+sxm::NumValue log2_fn_leval(Range<sxm::LEvalNodeNum *> arg_list);
+bool log2_validator(std::size_t arg_size);
+constexpr Def log2_def { log2_fn_raw, log2_fn_feval, log2_fn_leval, log2_validator, };
+
+sxm::NumValue log10_fn_raw(Range<sxm::NumValue> arg_list);
+sxm::NumValue log10_fn_feval(Range<sxm::FEvalNodeNum *> arg_list);
+sxm::NumValue log10_fn_leval(Range<sxm::LEvalNodeNum *> arg_list);
+bool log10_validator(std::size_t arg_size);
+constexpr Def log10_def { log10_fn_raw, log10_fn_feval, log10_fn_leval, log10_validator, };
+
+sxm::NumValue b_fn_raw(Range<sxm::NumValue> arg_list);
+sxm::NumValue b_fn_feval(Range<sxm::FEvalNodeNum *> arg_list);
+sxm::NumValue b_fn_leval(Range<sxm::LEvalNodeNum *> arg_list);
+bool b_validator(std::size_t arg_size);
+constexpr Def b_def { b_fn_raw, b_fn_feval, b_fn_leval, b_validator, };
+
+constexpr HMapConst<64, 12, Def> hmap {
+    std::array<HMapConst_HNode<Def>, 12> {
+        HMapConst_HNode<Def>{ Range<const char>{ "b" }, sxm::numfn::b_def },
+        HMapConst_HNode<Def>{ Range<const char>{ "int" }, sxm::numfn::int_def },
+
+        HMapConst_HNode<Def>{ Range<const char>{ "if" }, sxm::numfn::if_def },
+        HMapConst_HNode<Def>{ Range<const char>{ "ife" }, sxm::numfn::ife_def },
+
+        HMapConst_HNode<Def>{ Range<const char>{ "sin" }, sxm::numfn::sin_def },
+        HMapConst_HNode<Def>{ Range<const char>{ "cos" }, sxm::numfn::cos_def },
+        HMapConst_HNode<Def>{ Range<const char>{ "tan" }, sxm::numfn::tan_def },
+        HMapConst_HNode<Def>{ Range<const char>{ "ctan" }, sxm::numfn::ctan_def },
+
+        HMapConst_HNode<Def>{ Range<const char>{ "ln" }, sxm::numfn::ln_def },
+        HMapConst_HNode<Def>{ Range<const char>{ "log" }, sxm::numfn::log_def },
+        HMapConst_HNode<Def>{ Range<const char>{ "log2" }, sxm::numfn::log2_def },
+        HMapConst_HNode<Def>{ Range<const char>{ "log10" }, sxm::numfn::log10_def },
     }
 };
 

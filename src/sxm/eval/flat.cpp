@@ -644,9 +644,9 @@ std::expected<sxm::NumValue, sxm::FEvalError> sxm::eval_flat(const char *src, HM
                         mem_tree = MemoryTree::memory_extend(mem_tree, mem_arg, &tstate);
                     }
 
-                    std::optional<sxm::NumFnFEval> lnode_fn = sxm::fn_hmap_feval.find(name);
+                    std::optional<sxm::numfn::Def> lnode_fndef = sxm::numfn::hmap.find(name);
 
-                    if (!lnode_fn.has_value()) {
+                    if (!lnode_fndef.has_value()) {
                         std::free(mem_arg.range.p_start);
                         std::free(mem_tree.range.p_start);
 
@@ -658,9 +658,7 @@ std::expected<sxm::NumValue, sxm::FEvalError> sxm::eval_flat(const char *src, HM
                         };
                     }
 
-                    std::optional<sxm::NumValue> lnode_result = lnode_fn.value()({});
-
-                    if (!lnode_result.has_value()) {
+                    if (!lnode_fndef->validator(0)) {
                         std::free(mem_arg.range.p_start);
                         std::free(mem_tree.range.p_start);
 
@@ -675,7 +673,7 @@ std::expected<sxm::NumValue, sxm::FEvalError> sxm::eval_flat(const char *src, HM
                     new (*tstate.treeptr) sxm::FEvalNodeNum {
                         tstate.treeptr,
                         tstate.parent,
-                        lnode_result.value()
+                        lnode_fndef->fn_feval({})
                     };
 
                     mem_tree.tree_alloc_raw(nodespace_num);
@@ -744,7 +742,7 @@ std::expected<sxm::NumValue, sxm::FEvalError> sxm::eval_flat(const char *src, HM
 
                 auto eval_report = fold_expr(*ltarget->arg_last(mem_arg.range.p_start), nullptr, {
                     .mem_arg = mem_arg,
-                    .val_hmap =val_hmap
+                    .val_hmap = val_hmap
                 });
 
                 if (!eval_report.has_value()) {
@@ -793,9 +791,9 @@ std::expected<sxm::NumValue, sxm::FEvalError> sxm::eval_flat(const char *src, HM
                     return std::unexpected { eval_report.error() };
                 }
 
-                std::optional<sxm::NumFnFEval> ltarget_fn = sxm::fn_hmap_feval.find(ltarget->name);
+                std::optional<sxm::numfn::Def> ltarget_fndef = sxm::numfn::hmap.find(ltarget->name);
 
-                if (!ltarget_fn.has_value()) {
+                if (!ltarget_fndef.has_value()) {
                     std::free(mem_arg.range.p_start);
                     std::free(mem_tree.range.p_start);
 
@@ -807,12 +805,7 @@ std::expected<sxm::NumValue, sxm::FEvalError> sxm::eval_flat(const char *src, HM
                     };
                 }
 
-                std::optional<sxm::NumValue> ltarget_result = ltarget_fn.value()({
-                    reinterpret_cast<sxm::FEvalNodeNum **>(ltarget->arg_first(mem_arg.range.p_start)),
-                    reinterpret_cast<sxm::FEvalNodeNum **>(ltarget->arg_last(mem_arg.range.p_start)) + 1,
-                });
-
-                if (!ltarget_result.has_value()) {
+                if (!ltarget_fndef->validator(ltarget->arg_list.size_list())) {
                     std::free(mem_arg.range.p_start);
                     std::free(mem_tree.range.p_start);
 
@@ -824,6 +817,11 @@ std::expected<sxm::NumValue, sxm::FEvalError> sxm::eval_flat(const char *src, HM
                     };
                 }
 
+                sxm::NumValue ltarget_result = ltarget_fndef->fn_feval({
+                    reinterpret_cast<sxm::FEvalNodeNum **>(ltarget->arg_first(mem_arg.range.p_start)),
+                    reinterpret_cast<sxm::FEvalNodeNum **>(ltarget->arg_last(mem_arg.range.p_start)) + 1,
+                });
+
                 mem_arg.free(ltarget->arg_list.size_list());
 
                 {
@@ -833,7 +831,7 @@ std::expected<sxm::NumValue, sxm::FEvalError> sxm::eval_flat(const char *src, HM
                     new (ltarget) sxm::FEvalNodeNum {
                         slot,
                         parent,
-                        ltarget_result.value(),
+                        ltarget_result,
                     };
                 }
 

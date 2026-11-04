@@ -443,10 +443,10 @@ std::expected<sxm::NumValue, sxm::LEvalError> sxm::eval_linked(const char *src, 
                     return std::unexpected(token_now.error());
                 }
 
-                if (token_now->kind ==sxm::Token_Kind::FnClose) {
-                    std::optional<sxm::NumFnLEval> fn_ptr = fn_hmap_leval.find(name);
+                if (token_now->kind == sxm::Token_Kind::FnClose) {
+                    std::optional<sxm::numfn::Def> fn_def = sxm::numfn::hmap.find(name);
 
-                    if (!fn_ptr.has_value()) {
+                    if (!fn_def.has_value()) {
                         delete root;
 
                         return std::unexpected {
@@ -457,9 +457,7 @@ std::expected<sxm::NumValue, sxm::LEvalError> sxm::eval_linked(const char *src, 
                         };
                     }
 
-                    std::optional<sxm::NumValue> fn_value = fn_ptr.value()({ nullptr, nullptr });
-
-                    if (!fn_value.has_value()) {
+                    if (!fn_def->validator(0)) {
                         delete root;
 
                         return std::unexpected {
@@ -473,7 +471,7 @@ std::expected<sxm::NumValue, sxm::LEvalError> sxm::eval_linked(const char *src, 
                     *tstate.treeptr = new LEvalNodeNum {
                         tstate.treeptr,
                         tstate.parent,
-                        fn_value.value(),
+                        fn_def->fn_leval({ nullptr, nullptr }),
                     };
 
                     ++token_gen_now;
@@ -560,9 +558,9 @@ std::expected<sxm::NumValue, sxm::LEvalError> sxm::eval_linked(const char *src, 
                 return std::unexpected { fold_report.value() };
             }
 
-            std::optional<sxm::NumFnLEval> fn_ptr = fn_hmap_leval.find(lnode->name);
+            std::optional<sxm::numfn::Def> fn_def = sxm::numfn::hmap.find(lnode->name);
 
-            if (!fn_ptr.has_value()) {
+            if (!fn_def.has_value()) {
                 Range<const char> name = lnode->name;
 
                 delete root;
@@ -575,12 +573,7 @@ std::expected<sxm::NumValue, sxm::LEvalError> sxm::eval_linked(const char *src, 
                 };
             }
 
-            std::optional<sxm::NumValue> fn_value = fn_ptr.value()({
-                reinterpret_cast<sxm::LEvalNodeNum **>(lnode->arg_list.data()),
-                reinterpret_cast<sxm::LEvalNodeNum **>(lnode->arg_list.data() + lnode->arg_list.size()),
-            });
-
-            if (!fn_value.has_value()) {
+            if (!fn_def->validator(lnode->arg_list.size())) {
                 Range<const char> name = lnode->name;
 
                 delete root;
@@ -596,12 +589,17 @@ std::expected<sxm::NumValue, sxm::LEvalError> sxm::eval_linked(const char *src, 
             sxm::LEvalNode **slot = lnode->slot;
             sxm::LEvalNode *parent = lnode->parent;
 
+            sxm::NumValue fn_value = fn_def->fn_leval({
+                reinterpret_cast<sxm::LEvalNodeNum **>(lnode->arg_list.data()),
+                reinterpret_cast<sxm::LEvalNodeNum **>(lnode->arg_list.data() + lnode->arg_list.size()),
+            });
+
             delete lnode;
 
             *slot = new sxm::LEvalNodeNum {
                 slot,
                 parent,
-                fn_value.value(),
+                fn_value,
             };
 
             tstate.treeptr = slot;
