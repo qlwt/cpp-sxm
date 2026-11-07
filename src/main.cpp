@@ -1,4 +1,5 @@
 #include "algo/search_map/h_static.hpp"
+#include "sxm/cmd/assemble.hpp"
 #include "sxm/cmd/perf.hpp"
 #include "sxm/ast/numvalue.hpp"
 #include <charconv>
@@ -21,6 +22,7 @@
 int main() {
     static constexpr std::string_view cmd_exit = ":exit";
     static constexpr std::string_view cmd_tkn = ":tkn ";
+    static constexpr std::string_view cmd_asm = ":asm ";
     static constexpr std::string_view cmd_tree = ":tree ";
     static constexpr std::string_view cmd_perf = ":perf ";
     static constexpr std::string_view cmd_perfsm = ":perfsm ";
@@ -114,6 +116,8 @@ int main() {
             sxm::cmd::tree(line.c_str() + cmd_tree.size());
         } else if (line.starts_with(cmd_linked)) {
             sxm::cmd::eval_linked(line.c_str() + cmd_linked.size(), &val_hmap);
+        } else if (line.starts_with(cmd_asm)) {
+            sxm::cmd::assemble(line.c_str() + cmd_asm.size(), &val_hmap);
         } else if (line.starts_with(cmd_pure)) {
             sxm::cmd::eval_pure(line.c_str() + cmd_pure.size(), &val_hmap);
         } else if (line.starts_with(cmd_flat)) {

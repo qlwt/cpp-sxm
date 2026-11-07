@@ -1,13 +1,12 @@
 #include "sxm/cmd/perf.hpp"
-#include "algo/search_map/h.hpp"
 #include "algo/search_map/h_static.hpp"
 #include "sxm/debug/print_err_eval.hpp"
 #include "sxm/debug/print_err_parser.hpp"
+#include "sxm/eval/compile.hpp"
 #include "sxm/eval/flat.hpp"
 #include "sxm/eval/linked.hpp"
 #include "sxm/eval/pure.hpp"
 #include "sxm/parser/parse.hpp"
-#include <functional>
 #include <random>
 #include <string>
 #include <chrono>
@@ -256,6 +255,42 @@ void sxm::cmd::perf(std::size_t size, bool flag_safe) {
 
         std::printf("eval_linked::done %f\n", (double)lduration / 1e6);
         std::printf("eval_linked::done::noparse %f\n", (double)(lduration - parse_duration) / 1e6);
+        std::printf("\n");
+    }
+
+    {
+        HMapStatic<10, sxm::NumValue> sxmvar_const {};
+        HMapStatic<10, sxm::CEvalOffset> sxmvar_state {};
+        std::printf("eval_compile::start tokens_size=%lu\n", expr_linked.size());
+
+        std::size_t lduration = exec([&]() -> void {
+            const char *src = expr_linked.c_str();
+
+            std::expected<sxm::CEvalDeclaration, sxm::CEvalError> decl = sxm::eval_compile_build(src, {
+                .sxmvar_const = &sxmvar_const,
+                .sxmvar_state = &sxmvar_state,
+                .sxmvar_state_size = 0,
+            });
+
+            if (!decl.has_value()) {
+                std::visit([src](const auto & error) {
+                    using T = std::decay_t<decltype(error)>;
+
+                    if constexpr (std::is_same_v<T, sxm::ParserError>) {
+                        sxm::print_err_parser(error, src);
+                    } else if constexpr (std::is_same_v<T, sxm::EvalError>) {
+                        sxm::print_err_eval(error);
+                    }
+                }, decl.error());
+            } else {
+                sxm::NumValue result = decl->eval({});
+
+                printf("Value is %f\n", result.real);
+            }
+        });
+
+        std::printf("eval_compile::done %f\n", (double)lduration / 1e6);
+        std::printf("eval_compile::done::noparse %f\n", (double)(lduration - parse_duration) / 1e6);
         std::printf("\n");
     }
 }

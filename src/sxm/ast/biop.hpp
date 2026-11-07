@@ -1,5 +1,6 @@
 #pragma once
 
+#include "sxm/ast/numvalue.hpp"
 namespace sxm {
 
 enum class BinaryOp {
@@ -23,5 +24,6 @@ enum class BinaryOp {
 
 BinaryOp biop_let(const char *name_start, const char* name_end);
 unsigned short biop_priority_let(sxm::BinaryOp biop);
+sxm::NumValue biop_apply(sxm::BinaryOp op, const sxm::NumValue &left, const sxm::NumValue &right);
 
 }

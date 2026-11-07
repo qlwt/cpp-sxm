@@ -1,4 +1,5 @@
 #include "sxm/ast/biop.hpp"
+#include "sxm/ast/numvalue.hpp"
 #include <utility>
 
 sxm::BinaryOp sxm::biop_let(const char *section_start, const char* section_end) {
@@ -79,4 +80,51 @@ unsigned short sxm::biop_priority_let(sxm::BinaryOp biop) {
     }
 
     std::unreachable();
+}
+
+sxm::NumValue sxm::biop_apply(sxm::BinaryOp op, const sxm::NumValue &left, const sxm::NumValue &right) {
+    switch (op) {
+    case sxm::BinaryOp::Mul: {
+        return sxm::NumValue::mul(&left, &right);
+    }
+    case sxm::BinaryOp::Div: {
+        return sxm::NumValue::div(&left, &right);
+    }
+    case sxm::BinaryOp::Sub: {
+        return sxm::NumValue::sub(&left, &right);
+    }
+    case sxm::BinaryOp::Add: {
+        return sxm::NumValue::add(&left, &right);
+    }
+    case sxm::BinaryOp::Mod: {
+        return sxm::NumValue::mod(&left, &right);
+    }
+    case sxm::BinaryOp::Pow: {
+        return sxm::NumValue::pow(&left, &right);
+    }
+    case sxm::BinaryOp::Eq: {
+        return sxm::NumValue::eq(&left, &right);
+    }
+    case sxm::BinaryOp::UEq: {
+        return sxm::NumValue::ueq(&left, &right);
+    }
+    case sxm::BinaryOp::LT: {
+        return sxm::NumValue::lt(&left, &right);
+    }
+    case sxm::BinaryOp::LTE: {
+        return sxm::NumValue::lte(&left, &right);
+    }
+    case sxm::BinaryOp::GT: {
+        return sxm::NumValue::gt(&left, &right);
+    }
+    case sxm::BinaryOp::GTE: {
+        return sxm::NumValue::gte(&left, &right);
+    }
+    case sxm::BinaryOp::Assign: {
+        return right;
+    }
+    default: {
+        std::unreachable();
+    }
+    }
 }

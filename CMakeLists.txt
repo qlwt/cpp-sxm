@@ -24,14 +24,17 @@ add_executable(main
     src/sxm/eval/pure.cpp
     src/sxm/eval/flat.cpp
     src/sxm/eval/linked.cpp
+    src/sxm/eval/compile.cpp
 
     src/sxm/cmd/tkn.cpp
     src/sxm/cmd/tree.cpp
     src/sxm/cmd/perf.cpp
     src/sxm/cmd/perfsm.cpp
+    src/sxm/cmd/assemble.cpp
     src/sxm/cmd/eval_pure.cpp
     src/sxm/cmd/eval_flat.cpp
     src/sxm/cmd/eval_linked.cpp
+    src/sxm/cmd/eval_compile.cpp
 
     src/sxm/debug/print_ast.cpp
     src/sxm/debug/print_err_eval.cpp
@@ -50,14 +53,20 @@ target_compile_options(main
         $<$<CONFIG:Debug>:-fsanitize=address,undefined>
 )
 
+target_link_options(main
+    PRIVATE
+        $<$<CONFIG:Debug>:-fsanitize=address,undefined>
+)
+
 target_compile_options(main
     PRIVATE
+        $<$<CONFIG:Release>:-flto=auto>
         $<$<CONFIG:Release>:-O3>
 )
 
 target_link_options(main
     PRIVATE
-        $<$<CONFIG:Debug>:-fsanitize=address,undefined>
+        $<$<CONFIG:Release>:-flto=auto>
 )
 
 target_include_directories(main

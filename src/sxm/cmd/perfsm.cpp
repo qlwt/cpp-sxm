@@ -1,13 +1,11 @@
 #include "sxm/cmd/perfsm.hpp"
-#include "algo/search_map/h.hpp"
 #include "algo/search_map/h_static.hpp"
 #include "sxm/debug/print_err_eval.hpp"
 #include "sxm/debug/print_err_parser.hpp"
-#include "sxm/eval/flat.hpp"
-#include "sxm/eval/linked.hpp"
+#include "sxm/eval/compile.hpp"
 #include "sxm/eval/pure.hpp"
 #include "sxm/parser/parse.hpp"
-#include <functional>
+#include <cstddef>
 #include <random>
 #include <string>
 #include <chrono>
@@ -142,7 +140,8 @@ std::size_t exec(T cb) {
 
 void sxm::cmd::perfsm(std::size_t size, std::size_t repeats) {
     std::string expr_pure = expr_new(size);
-    std::string expr_compile = expr_pure;
+    std::string expr_compile_decl = expr_pure;
+    std::string expr_compile_unit = expr_pure;
 
     std::printf("tokens_size=%lu\n", expr_pure.size());
 
@@ -159,7 +158,7 @@ void sxm::cmd::perfsm(std::size_t size, std::size_t repeats) {
                 for (std::size_t repeats_left = repeats; repeats_left-- > 0;) {
                     HMapStatic<10, sxm::NumValue> val_hmap {};
 
-                    val_hmap.insert({ "n" }, { 1.0 });
+                    val_hmap.insert({ "n" }, { static_cast<double>(repeats_left) });
 
                     std::expected<sxm::NumValue, sxm::EvalError> result = sxm::eval_pure(ast.value(), &val_hmap);
 
@@ -176,6 +175,84 @@ void sxm::cmd::perfsm(std::size_t size, std::size_t repeats) {
             delete ast.value();
 
             std::printf("eval_pure::done %f\n", (double)lduration / 1e6);
+            std::printf("\n");
+        }
+    }
+
+    {
+        const char *src = expr_compile_decl.c_str();
+
+        HMapStatic<32, sxm::CEvalOffset> sxmvar_local {};
+
+        sxmvar_local.insert({ "n" }, 0);
+
+        std::expected<sxm::CEvalDeclaration, sxm::CEvalError> decl = sxm::eval_compile_build(src, {
+            .sxmvar_const {},
+            .sxmvar_state = &sxmvar_local,
+            .sxmvar_state_size = 1
+        });
+
+        if (!decl.has_value()) {
+            std::visit([src](const auto & error) {
+                using T = std::decay_t<decltype(error)>;
+
+                if constexpr (std::is_same_v<T, sxm::ParserError>) {
+                    sxm::print_err_parser(error, src);
+                } else if constexpr (std::is_same_v<T, sxm::EvalError>) {
+                    sxm::print_err_eval(error);
+                }
+            }, decl.error());
+        } else {
+            std::size_t lduration = exec([&]() -> void {
+                for (std::size_t repeats_left = repeats; repeats_left-- > 0;) {
+                    sxm::NumValue sxmvar_local[1] {
+                        { static_cast<double>(repeats_left) },
+                    };
+
+                    decl->eval({ sxmvar_local, sxmvar_local + 1, });
+                }
+            });
+
+            std::printf("eval_compile_decl::done %f\n", (double)lduration / 1e6);
+            std::printf("\n");
+        }
+    }
+
+    {
+        const char *src = expr_compile_unit.c_str();
+
+        HMapStatic<32, sxm::CEvalOffset> sxmvar_local {};
+
+        sxmvar_local.insert({ "n" }, 0);
+
+        std::expected<sxm::CEvalDeclaration, sxm::CEvalError> decl = sxm::eval_compile_build(src, {
+            .sxmvar_const {},
+            .sxmvar_state = &sxmvar_local,
+            .sxmvar_state_size = 1
+        });
+
+        if (!decl.has_value()) {
+            std::visit([src](const auto & error) {
+                using T = std::decay_t<decltype(error)>;
+
+                if constexpr (std::is_same_v<T, sxm::ParserError>) {
+                    sxm::print_err_parser(error, src);
+                } else if constexpr (std::is_same_v<T, sxm::EvalError>) {
+                    sxm::print_err_eval(error);
+                }
+            }, decl.error());
+        } else {
+            sxm::CEvalUnit unit = decl->init();
+
+            std::size_t lduration = exec([&]() -> void {
+                for (std::size_t repeats_left = repeats; repeats_left-- > 0;) {
+                    unit.state_list.p_start[0] = sxm::NumValue { (double)repeats_left };
+
+                    unit.eval();
+                }
+            });
+
+            std::printf("eval_compile_unit::done %f\n", (double)lduration / 1e6);
             std::printf("\n");
         }
     }
