@@ -1,6 +1,4 @@
-#include "algo/search_map/h_static.hpp"
-#include "sxm/cmd/assemble.hpp"
-#include "sxm/cmd/perf.hpp"
+#include "sxm/util/search_map/h_static.hpp"
 #include "sxm/ast/numvalue.hpp"
 #include <charconv>
 #include <cmath>
@@ -8,21 +6,21 @@
 #include <iostream>
 #include <math.h>
 #include <string>
-#include "sxm/cmd/perfsm.hpp"
-#include "sxm/debug/print_ast.hpp"
-#include "sxm/debug/valid_let.hpp"
-#include "sxm/cmd/tkn.hpp"
-#include "sxm/cmd/tree.hpp"
-#include "sxm/cmd/eval_pure.hpp"
-#include "sxm/cmd/eval_flat.hpp"
-#include "sxm/cmd/eval_compile.hpp"
-#include "sxm/cmd/eval_linked.hpp"
+#include "cmd/bytecode.hpp"
+#include "cmd/perf.hpp"
+#include "cmd/perfsm.hpp"
+#include "cmd/tkn.hpp"
+#include "cmd/tree.hpp"
+#include "cmd/eval_pure.hpp"
+#include "cmd/eval_flat.hpp"
+#include "cmd/eval_compile.hpp"
+#include "cmd/eval_linked.hpp"
 #include <charconv>
 
 int main() {
     static constexpr std::string_view cmd_exit = ":exit";
     static constexpr std::string_view cmd_tkn = ":tkn ";
-    static constexpr std::string_view cmd_asm = ":asm ";
+    static constexpr std::string_view cmd_asm = ":bytecode ";
     static constexpr std::string_view cmd_tree = ":tree ";
     static constexpr std::string_view cmd_perf = ":perf ";
     static constexpr std::string_view cmd_perfsm = ":perfsm ";
@@ -32,11 +30,11 @@ int main() {
     static constexpr std::string_view cmd_pure = ":ep ";
     static constexpr std::string_view cmd_compile = ":ec ";
 
-    static HMapStatic<255, sxm::NumValue> val_hmap {};
+    sxm::HMapStatic<255, sxm::NumValue> varmap {};
 
-    val_hmap.insert({ "e" }, sxm::NumValue { std::numbers::e });
-    val_hmap.insert({ "pi" }, sxm::NumValue { std::numbers::pi });
-    val_hmap.insert({ "phi" }, sxm::NumValue { std::numbers::phi });
+    varmap.insert({ "e" }, sxm::NumValue { std::numbers::e });
+    varmap.insert({ "pi" }, sxm::NumValue { std::numbers::pi });
+    varmap.insert({ "phi" }, sxm::NumValue { std::numbers::phi });
 
     while (true) {
         std::printf("Enter Command or Formula: ");
@@ -54,7 +52,7 @@ int main() {
             std::from_chars(line.c_str() + cmd_perf.size(), line.c_str() + line.size(), size);
 
             if (!std::isnan(size) && !std::isinf(size) && size >= 1) {
-                sxm::cmd::perf((std::size_t)size, false);
+                cmd::perf((std::size_t)size, false);
             } else {
                 std::printf("size should be >= 1\n");
             }
@@ -64,7 +62,7 @@ int main() {
             std::from_chars(line.c_str() + cmd_perf_safe.size(), line.c_str() + line.size(), size);
 
             if (!std::isnan(size) && !std::isinf(size) && size >= 1) {
-                sxm::cmd::perf((std::size_t)size, true);
+                cmd::perf((std::size_t)size, true);
             } else {
                 std::printf("size should be >= 1\n");
             }
@@ -93,7 +91,7 @@ int main() {
             if (delim_idx == nullptr) {
                 std::printf("Bad argument format. Expected {token_size}*{repeats}\n");
 
-                return 1;
+                continue;
             }
 
             auto parser_amount = std::from_chars(src, delim_idx, size);
@@ -103,29 +101,29 @@ int main() {
                 if (delim_idx == nullptr) {
                     std::printf("Bad argument format. Expected {token_size}*{repeats}\n");
 
-                    return 1;
+                    continue;
                 }
             }
 
             std::printf("size: %lu repeats: %lu\n", static_cast<std::size_t>(size), static_cast<std::size_t>(repeats));
 
-            sxm::cmd::perfsm(size, repeats);
+            cmd::perfsm(size, repeats);
         } else if (line.starts_with(cmd_tkn)) {
-            sxm::cmd::tkn(line.c_str() + cmd_tkn.size());
+            cmd::tkn(line.c_str() + cmd_tkn.size());
         } else if (line.starts_with(cmd_tree)) {
-            sxm::cmd::tree(line.c_str() + cmd_tree.size());
+            cmd::tree(line.c_str() + cmd_tree.size());
         } else if (line.starts_with(cmd_linked)) {
-            sxm::cmd::eval_linked(line.c_str() + cmd_linked.size(), &val_hmap);
+            cmd::eval_linked(line.c_str() + cmd_linked.size(), &varmap);
         } else if (line.starts_with(cmd_asm)) {
-            sxm::cmd::assemble(line.c_str() + cmd_asm.size(), &val_hmap);
+            cmd::bytecode(line.c_str() + cmd_asm.size(), &varmap);
         } else if (line.starts_with(cmd_pure)) {
-            sxm::cmd::eval_pure(line.c_str() + cmd_pure.size(), &val_hmap);
+            cmd::eval_pure(line.c_str() + cmd_pure.size(), &varmap);
         } else if (line.starts_with(cmd_flat)) {
-            sxm::cmd::eval_flat(line.c_str() + cmd_flat.size(), &val_hmap);
+            cmd::eval_flat(line.c_str() + cmd_flat.size(), &varmap);
         } else if (line.starts_with(cmd_compile)) {
-            sxm::cmd::eval_compile(line.c_str() + cmd_flat.size(), &val_hmap);
+            cmd::eval_compile(line.c_str() + cmd_flat.size(), &varmap);
         } else {
-            sxm::cmd::eval_flat(line.c_str(), &val_hmap);
+            cmd::eval_flat(line.c_str(), &varmap);
         }
     }
 

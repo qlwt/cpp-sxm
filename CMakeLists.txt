@@ -10,38 +10,15 @@ set(CMAKE_CXX_EXTENSIONS off)
 add_executable(main
     src/main.cpp
 
-    src/sxm/parser/parse.cpp
-    src/sxm/matcher/pattern_bop.cpp
-    src/sxm/matcher/pattern_num.cpp
-    src/sxm/matcher/pattern_ref.cpp
-    src/sxm/matcher/pattern_scope_end.cpp
-
-    src/sxm/ast/uop.cpp
-    src/sxm/ast/biop.cpp
-    src/sxm/ast/fnmap.cpp
-    src/sxm/ast/numvalue.cpp
-
-    src/sxm/eval/pure.cpp
-    src/sxm/eval/flat.cpp
-    src/sxm/eval/linked.cpp
-    src/sxm/eval/compile.cpp
-
-    src/sxm/cmd/tkn.cpp
-    src/sxm/cmd/tree.cpp
-    src/sxm/cmd/perf.cpp
-    src/sxm/cmd/perfsm.cpp
-    src/sxm/cmd/assemble.cpp
-    src/sxm/cmd/eval_pure.cpp
-    src/sxm/cmd/eval_flat.cpp
-    src/sxm/cmd/eval_linked.cpp
-    src/sxm/cmd/eval_compile.cpp
-
-    src/sxm/debug/print_ast.cpp
-    src/sxm/debug/print_err_eval.cpp
-    src/sxm/debug/print_err_parser.cpp
-    src/sxm/debug/print_ast.cpp
-    src/sxm/debug/tostr.cpp
-    src/sxm/debug/valid_let.cpp
+    src/cmd/tkn.cpp
+    src/cmd/tree.cpp
+    src/cmd/perf.cpp
+    src/cmd/perfsm.cpp
+    src/cmd/bytecode.cpp
+    src/cmd/eval_pure.cpp
+    src/cmd/eval_flat.cpp
+    src/cmd/eval_linked.cpp
+    src/cmd/eval_compile.cpp
 )
 
 target_compile_options(main
@@ -67,6 +44,13 @@ target_compile_options(main
 target_link_options(main
     PRIVATE
         $<$<CONFIG:Release>:-flto=auto>
+)
+
+add_subdirectory(vendor/sxm)
+
+target_link_libraries(main
+    PRIVATE
+        sxm::sxm
 )
 
 target_include_directories(main
