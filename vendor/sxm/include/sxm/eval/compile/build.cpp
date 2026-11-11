@@ -233,6 +233,9 @@ struct TraversalState {
 
 inline Instr_Kind instr_kind_let_uop(UnaryOp op) noexcept {
     switch (op) {
+    case UnaryOp::Not: {
+        return Instr_Kind::Not;
+    }
     case UnaryOp::Neg: {
         return Instr_Kind::Neg;
     }
@@ -284,6 +287,12 @@ inline Instr_Kind instr_kind_let_biop(BinaryOp op) noexcept {
     }
     case BinaryOp::LTE: {
         return Instr_Kind::LTE;
+    }
+    case BinaryOp::Conj: {
+        return Instr_Kind::Conj;
+    }
+    case BinaryOp::Disj: {
+        return Instr_Kind::Disj;
     }
     }
 

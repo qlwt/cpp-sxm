@@ -66,12 +66,27 @@ void cmd::bytecode(const char *src, sxm::HMap<sxm::NumValue> *varmap) {
 
                 break;
             }
+            case sxm::ceval::Instr_Kind::Not: {
+                std::println("not {} {}", offset_parse(instr_now.left.offset), offset_parse(instr_now.output.offset));
+
+                break;
+            }
             case sxm::ceval::Instr_Kind::Neg: {
                 std::println("neg {} {}", offset_parse(instr_now.left.offset), offset_parse(instr_now.output.offset));
 
                 break;
             }
 
+            case sxm::ceval::Instr_Kind::Conj: {
+                std::println("conj {} {} {}", offset_parse(instr_now.left.offset), offset_parse(instr_now.right.offset), offset_parse(instr_now.output.offset));
+
+                break;
+            }
+            case sxm::ceval::Instr_Kind::Disj: {
+                std::println("disj {} {} {}", offset_parse(instr_now.left.offset), offset_parse(instr_now.right.offset), offset_parse(instr_now.output.offset));
+
+                break;
+            }
             case sxm::ceval::Instr_Kind::Add: {
                 std::println("add {} {} {}", offset_parse(instr_now.left.offset), offset_parse(instr_now.right.offset), offset_parse(instr_now.output.offset));
 

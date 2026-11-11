@@ -44,7 +44,22 @@ NumValue Unit::eval() noexcept {
 
             break;
         }
+        case Instr_Kind::Not: {
+            *instr_now->output.value = NumValue::lneg(*instr_now->left.value);
 
+            break;
+        }
+
+        case Instr_Kind::Conj: {
+            *instr_now->output.value = NumValue::conj(*instr_now->left.value, *instr_now->right.value);
+
+            break;
+        }
+        case Instr_Kind::Disj: {
+            *instr_now->output.value = NumValue::disj(*instr_now->left.value, *instr_now->right.value);
+
+            break;
+        }
         case Instr_Kind::Add: {
             *instr_now->output.value = NumValue::add(*instr_now->left.value, *instr_now->right.value);
 

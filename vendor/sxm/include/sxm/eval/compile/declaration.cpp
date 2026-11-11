@@ -53,7 +53,30 @@ inline NumValue l_eval(Range<Instr> instr_list, Range<NumValue> const_list, NumV
 
             break;
         }
+        case Instr_Kind::Not: {
+            NumValue *left = instr_now->left.offset.resolve(const_list.p_start, state_list);
 
+            *output = NumValue::lneg(*left);
+
+            break;
+        }
+
+        case Instr_Kind::Conj: {
+            NumValue *left = instr_now->left.offset.resolve(const_list.p_start, state_list);
+            NumValue *right = instr_now->right.offset.resolve(const_list.p_start, state_list);
+
+            *output = NumValue::conj(*left, *right);
+
+            break;
+        }
+        case Instr_Kind::Disj: {
+            NumValue *left = instr_now->left.offset.resolve(const_list.p_start, state_list);
+            NumValue *right = instr_now->right.offset.resolve(const_list.p_start, state_list);
+
+            *output = NumValue::disj(*left, *right);
+
+            break;
+        }
         case Instr_Kind::Add: {
             NumValue *left = instr_now->left.offset.resolve(const_list.p_start, state_list);
             NumValue *right = instr_now->right.offset.resolve(const_list.p_start, state_list);
@@ -254,6 +277,7 @@ Unit Declaration::init() const noexcept {
         }
 
         case Instr_Kind::Set:
+        case Instr_Kind::Not:
         case Instr_Kind::Neg: {
             dest_inst->left.value = src_inst->left.offset.resolve(this->const_list.p_start, state_list.p_start);
             dest_inst->output.value = src_inst->output.offset.resolve(this->const_list.p_start, state_list.p_start);
@@ -271,6 +295,8 @@ Unit Declaration::init() const noexcept {
         case Instr_Kind::UEq:
         case Instr_Kind::GTE:
         case Instr_Kind::LTE:
+        case Instr_Kind::Conj:
+        case Instr_Kind::Disj:
         case Instr_Kind::LT:
         case Instr_Kind::GT: {
             dest_inst->left.value = src_inst->left.offset.resolve(this->const_list.p_start, state_list.p_start);

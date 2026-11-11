@@ -58,6 +58,7 @@ enum class Instr_Kind {
 
     Set,
     Neg,
+    Not,
 
     Add,
     Sub,
@@ -65,6 +66,8 @@ enum class Instr_Kind {
     Div,
     Mod,
     Pow,
+    Conj,
+    Disj,
     Eq,
     UEq,
     GTE,

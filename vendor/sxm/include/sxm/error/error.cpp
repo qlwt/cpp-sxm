@@ -36,7 +36,7 @@ std::string ParserError::tostr() const noexcept {
             res += std::format("{}", std::string_view  { this->src, this->src + this->pointer });
         }
 
-        res += std::format("|{}", std::string_view { src + this->pointer, src +this->pointer + 10 });
+        res += std::format("${}", std::string_view { src + this->pointer, src +this->pointer + 10 });
     }
 
     return res;

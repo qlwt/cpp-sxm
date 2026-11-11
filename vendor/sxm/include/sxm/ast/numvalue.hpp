@@ -13,6 +13,7 @@ class NumValue {
     static NumValue parse_real(const char *name_start, const char *name_end) noexcept;
 
     static NumValue neg(const NumValue &child) noexcept;
+    static NumValue lneg(const NumValue &left) noexcept;
     static NumValue add(const NumValue &left, const NumValue &right) noexcept;
     static NumValue sub(const NumValue &left, const NumValue &right) noexcept;
     static NumValue mul(const NumValue &left, const NumValue &right) noexcept;
@@ -27,6 +28,9 @@ class NumValue {
 
     static NumValue eq(const NumValue &left, const NumValue &right) noexcept;
     static NumValue ueq(const NumValue &left, const NumValue &right) noexcept;
+
+    static NumValue conj(const NumValue &left, const NumValue &right) noexcept;
+    static NumValue disj(const NumValue &left, const NumValue &right) noexcept;
 };
 
 }

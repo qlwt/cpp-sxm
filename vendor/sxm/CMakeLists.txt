@@ -1,7 +1,7 @@
 add_library(sxm STATIC
     include/sxm/error/error.cpp
     include/sxm/parser/parse.cpp
-    include/sxm/matcher/pattern_bop.cpp
+    include/sxm/matcher/pattern_biop.cpp
     include/sxm/matcher/pattern_num.cpp
     include/sxm/matcher/pattern_ref.cpp
     include/sxm/matcher/pattern_scope_end.cpp

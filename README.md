@@ -36,7 +36,7 @@ The project explores four evaluation strategies:
   2. Multiplication, division, modulo: `*`, `/`, `%`
   3. Addition, subtraction: `+`, `-`
   4. Assignment: `=`
-  5. Comparisons: `>`, `>=`, `<`, `<=`, `==`, `!=`
+  5. Logical: `>`, `>=`, `<`, `<=`, `==`, `!=`, `&&`, `||`
 
 **Built-in Functions**
 
@@ -57,7 +57,8 @@ All arguments are evaluated, including those not used in the returned result.
 Examples:
 
 ```cpp
-prepare(n = 3, b = 8, n * b)  // 24
+n = !30 && 5                 // 0 (n = !30 evaluated first)
+prepare(n = 3, b = 8, n * b) // 24
 3 * (1 + 1)                  // 6
 3 + 3 * 3                    // 12
 -log(2, 2^10)                // -10

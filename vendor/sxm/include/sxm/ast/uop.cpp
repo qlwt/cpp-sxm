@@ -1,4 +1,5 @@
 #include "sxm/ast/uop.hpp"
+#include "sxm/ast/numvalue.hpp"
 #include <string>
 #include <utility>
 
@@ -9,6 +10,9 @@ std::string sxm::uop_tostr(UnaryOp kind) noexcept {
     }
     case UnaryOp::Neg: {
         return "-";
+    }
+    case UnaryOp::Not: {
+        return "!";
     }
     }
 
@@ -21,6 +25,8 @@ sxm::UnaryOp sxm::uop_let(const char *section_start) noexcept {
         return sxm::UnaryOp::Pos;
     case '-':
         return sxm::UnaryOp::Neg;
+    case '!':
+        return sxm::UnaryOp::Not;
     }
 
     std::unreachable();
@@ -33,6 +39,9 @@ sxm::NumValue sxm::uop_apply(sxm::UnaryOp op, const sxm::NumValue &target) noexc
     }
     case sxm::UnaryOp::Neg: {
         return sxm::NumValue::neg(target);
+    }
+    case sxm::UnaryOp::Not: {
+        return sxm::NumValue::lneg(target);
     }
     }
 

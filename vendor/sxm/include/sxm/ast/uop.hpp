@@ -8,6 +8,7 @@ namespace sxm {
 enum class UnaryOp {
     Pos,
     Neg,
+    Not,
 };
 
 std::string uop_tostr(sxm::UnaryOp op) noexcept;

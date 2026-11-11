@@ -9,7 +9,7 @@ template <sxm::Pattern_Kind idx_next>
 std::optional<sxm::Pattern_Match> pattern_uop(const char *src, const Pattern_Context *) {
     switch (*src) {
     case '+':
-        return Pattern_Match{
+        return Pattern_Match {
             .token = {
                 .kind = Token_Kind::Space,
                 .section_start = src,
@@ -18,8 +18,9 @@ std::optional<sxm::Pattern_Match> pattern_uop(const char *src, const Pattern_Con
 
             .idx_next = idx_next,
         };
+    case '!':
     case '-':
-        return Pattern_Match{
+        return Pattern_Match {
             .token = {
                 .kind = Token_Kind::UnaryOp,
                 .section_start = src,

@@ -1,5 +1,5 @@
 #include "sxm/parser/parse.hpp"
-#include "sxm/matcher/pattern_bop.hpp"
+#include "sxm/matcher/pattern_biop.hpp"
 #include "sxm/matcher/pattern_uop.hpp"
 #include "sxm/matcher/pattern_charseq.hpp"
 #include "sxm/matcher/pattern_scope_end.hpp"
@@ -38,13 +38,13 @@ const sxm::Pattern pattern_fnempty = sxm::pattern_race<6, std::array<sxm::Patter
 
 const sxm::Pattern pattern_operator_lit = sxm::pattern_race<3, std::array<sxm::Pattern, 3> {
     sxm::pattern_space<sxm::Pattern_Kind::OperatorLit>,
-    sxm::pattern_bop,
+    sxm::pattern_biop,
     sxm::pattern_scope_end,
 } >;
 
 const sxm::Pattern pattern_operator_ref = sxm::pattern_race<4, std::array<sxm::Pattern, 4> {
     sxm::pattern_space<sxm::Pattern_Kind::OperatorRef>,
-    sxm::pattern_bop,
+    sxm::pattern_biop,
     sxm::pattern_charseq<1, std::array<char, 1> { '(', }, sxm::Token_Kind::FnOpen, sxm::Pattern_Kind::FnEmpty >,
     sxm::pattern_scope_end,
 } >;

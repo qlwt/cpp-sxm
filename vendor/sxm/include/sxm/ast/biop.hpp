@@ -22,6 +22,9 @@ enum class BinaryOp {
 
     LT,
     LTE,
+
+    Conj,
+    Disj,
 };
 
 unsigned short biop_priority_let(sxm::BinaryOp biop) noexcept;

@@ -95,6 +95,11 @@ inline void stack_handle(std::vector<StackNode> *stack, Node *node, NumValue *ou
 
 inline void handle_uop(StackNode *snode, NodeUOp *nodeop) {
     switch (nodeop->operation) {
+    case UnaryOp::Not: {
+        *snode->output = NumValue::lneg(*snode->value_list);
+
+        break;
+    }
     case UnaryOp::Neg: {
         *snode->output = NumValue::neg(*snode->value_list);
 
@@ -169,6 +174,16 @@ inline void handle_biop(StackNode *snode, NodeBiOp *nodeop, HMap<NumValue> &varm
     }
     case BinaryOp::GTE: {
         *snode->output = NumValue::gte(*snode->value_list, snode->value_list[1]);
+
+        break;
+    }
+    case BinaryOp::Conj: {
+        *snode->output = NumValue::conj(*snode->value_list, snode->value_list[1]);
+
+        break;
+    }
+    case BinaryOp::Disj: {
+        *snode->output = NumValue::disj(*snode->value_list, snode->value_list[1]);
 
         break;
     }

@@ -378,32 +378,14 @@ std::expected<Node *, Error> fold_expr(Node *target, Node *limit, TraverseState 
             {
                 const auto lchild = static_cast<NodeNum *>(lnode->child);
 
-                switch (lnode->operation) {
-                case UnaryOp::Neg: {
-                    Node **slot = target->slot;
-                    Node *parent = target->parent;
+                Node **slot = target->slot;
+                Node *parent = target->parent;
 
-                    new (target) NodeNum {
-                        slot,
-                        parent,
-                        NumValue::neg(lchild->value),
-                    };
-
-                    break;
-                }
-                case UnaryOp::Pos: {
-                    Node **slot = target->slot;
-                    Node *parent = target->parent;
-
-                    new (target) NodeNum {
-                        slot,
-                        parent,
-                        lchild->value,
-                    };
-
-                    break;
-                }
-                }
+                new (target) NodeNum {
+                    slot,
+                    parent,
+                    uop_apply(lnode->operation, lchild->value),
+                };
 
                 if (target->parent == limit) {
                     return target;

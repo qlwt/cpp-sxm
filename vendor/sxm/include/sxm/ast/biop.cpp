@@ -26,6 +26,12 @@ std::string sxm::biop_tostr(BinaryOp kind) noexcept {
     case BinaryOp::Assign: {
         return "=";
     }
+    case BinaryOp::Conj: {
+        return "&&";
+    }
+    case BinaryOp::Disj: {
+        return "||";
+    }
     case BinaryOp::Eq: {
         return "==";
     }
@@ -63,6 +69,24 @@ sxm::BinaryOp sxm::biop_let(const char *section_start, const char* section_end) 
         return sxm::BinaryOp::Pow;
     case '%':
         return sxm::BinaryOp::Mod;
+    case '&': {
+        const char *section_next = section_start + 1;
+
+        if (section_next < section_end && *section_next == '&') {
+            return sxm::BinaryOp::Conj;
+        }
+
+        break;
+    }
+    case '|': {
+        const char *section_next = section_start + 1;
+
+        if (section_next < section_end && *section_next == '|') {
+            return sxm::BinaryOp::Disj;
+        }
+
+        break;
+    }
     case '>': {
         const char *section_next = section_start + 1;
 
@@ -112,6 +136,8 @@ unsigned short sxm::biop_priority_let(sxm::BinaryOp biop) noexcept {
     case sxm::BinaryOp::GTE:
     case sxm::BinaryOp::LT:
     case sxm::BinaryOp::LTE:
+    case sxm::BinaryOp::Conj:
+    case sxm::BinaryOp::Disj:
         return 0;
     case sxm::BinaryOp::Assign:
         return 1;
@@ -166,6 +192,12 @@ sxm::NumValue sxm::biop_apply(sxm::BinaryOp op, const sxm::NumValue &left, const
     }
     case sxm::BinaryOp::GTE: {
         return sxm::NumValue::gte(left, right);
+    }
+    case sxm::BinaryOp::Conj: {
+        return sxm::NumValue::conj(left, right);
+    }
+    case sxm::BinaryOp::Disj: {
+        return sxm::NumValue::disj(left, right);
     }
     case sxm::BinaryOp::Assign: {
         return right;
