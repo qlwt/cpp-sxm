@@ -145,7 +145,7 @@ void cmd::perfsm(std::size_t size, std::size_t repeats) {
     std::string expr_compile_decl = expr_pure;
     std::string expr_compile_unit = expr_pure;
 
-    std::printf("tokens_size=%lu\n", expr_pure.size());
+    std::printf("tokens_size=%llu\n", expr_pure.size());
 
     {
         const char *src = expr_pure.c_str();

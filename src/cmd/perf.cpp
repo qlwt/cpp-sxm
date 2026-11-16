@@ -154,7 +154,7 @@ void cmd::perf(std::size_t size, bool flag_safe) {
     std::size_t parse_duration;
 
     {
-        std::printf("parse::start tokens_size=%lu\n", expr_parse.size());
+        std::printf("parse::start tokens_size=%llu\n", expr_parse.size());
 
         parse_duration = exec([&]() -> void {
             const char *src = expr_parse.c_str();
@@ -175,7 +175,7 @@ void cmd::perf(std::size_t size, bool flag_safe) {
     if (!flag_safe) {
         sxm::HMapStatic<10, sxm::NumValue> varmap {};
 
-        std::printf("eval_pure::start tokens_size=%lu\n", expr_pure.size());
+        std::printf("eval_pure::start tokens_size=%llu\n", expr_pure.size());
 
         std::size_t lduration = exec([&]() -> void {
             const char *src = expr_pure.c_str();
@@ -210,7 +210,7 @@ void cmd::perf(std::size_t size, bool flag_safe) {
     {
         sxm::HMapStatic<10, sxm::NumValue> varmap {};
 
-        std::printf("eval_flat::start tokens_size=%lu\n", expr_flat.size());
+        std::printf("eval_flat::start tokens_size=%llu\n", expr_flat.size());
 
         std::size_t lduration = exec([&]() -> void {
             const char *src = expr_flat.c_str();
@@ -240,7 +240,7 @@ void cmd::perf(std::size_t size, bool flag_safe) {
 
     {
         sxm::HMapStatic<10, sxm::NumValue> varmap {};
-        std::printf("eval_linked::start tokens_size=%lu\n", expr_linked.size());
+        std::printf("eval_linked::start tokens_size=%llu\n", expr_linked.size());
 
         std::size_t lduration = exec([&]() -> void {
             const char *src = expr_linked.c_str();
@@ -271,7 +271,7 @@ void cmd::perf(std::size_t size, bool flag_safe) {
     {
         sxm::HMapStatic<10, sxm::NumValue> varmap_const {};
         sxm::HMapStatic<10, sxm::ceval::Offset> varmap_state {};
-        std::printf("eval_compile::start tokens_size=%lu\n", expr_linked.size());
+        std::printf("eval_compile::start tokens_size=%llu\n", expr_linked.size());
 
         std::size_t lduration = exec([&]() -> void {
             const char *src = expr_linked.c_str();

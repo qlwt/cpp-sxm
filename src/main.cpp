@@ -105,7 +105,7 @@ int main() {
                 }
             }
 
-            std::printf("size: %lu repeats: %lu\n", static_cast<std::size_t>(size), static_cast<std::size_t>(repeats));
+            std::printf("size: %llu repeats: %llu\n", static_cast<std::size_t>(size), static_cast<std::size_t>(repeats));
 
             cmd::perfsm(size, repeats);
         } else if (line.starts_with(cmd_tkn)) {

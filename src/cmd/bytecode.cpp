@@ -6,7 +6,6 @@
 #include "sxm/eval/compile/declaration.hpp"
 #include <expected>
 #include <format>
-#include <print>
 #include <string>
 #include <variant>
 
@@ -40,115 +39,115 @@ void cmd::bytecode(const char *src, sxm::HMap<sxm::NumValue> *varmap) {
             }
         }, result.error());
     } else {
-        std::printf("compiled successfully %lu instructions\n", result->instr_list.size());
+        std::printf("compiled successfully %llu instructions\n", result->instr_list.size());
 
         for (auto instr_now : result->instr_list) {
             switch (instr_now.kind) {
             case sxm::ceval::Instr_Kind::Ret: {
-                std::println("return {}", offset_parse(instr_now.left.offset));
+                std::printf("return %s\n", offset_parse(instr_now.left.offset).c_str());
 
                 break;
             }
 
             case sxm::ceval::Instr_Kind::Call: {
-                std::println("call {} {} {}", (void *)instr_now.left.fn, instr_now.right.length, offset_parse(instr_now.output.offset));
+                std::printf("call %p %llu %s\n", (void *)instr_now.left.fn, instr_now.right.length, offset_parse(instr_now.output.offset).c_str());
 
                 break;
             }
             case sxm::ceval::Instr_Kind::ArgPush: {
-                std::println("arg {}", offset_parse(instr_now.left.offset));
+                std::printf("arg %s\n", offset_parse(instr_now.left.offset).c_str());
 
                 break;
             }
 
             case sxm::ceval::Instr_Kind::Set: {
-                std::println("set {} {}", offset_parse(instr_now.left.offset), offset_parse(instr_now.output.offset));
+                std::printf("set %s %s\n", offset_parse(instr_now.left.offset).c_str(), offset_parse(instr_now.output.offset).c_str());
 
                 break;
             }
             case sxm::ceval::Instr_Kind::Not: {
-                std::println("not {} {}", offset_parse(instr_now.left.offset), offset_parse(instr_now.output.offset));
+                std::printf("not %s %s\n", offset_parse(instr_now.left.offset).c_str(), offset_parse(instr_now.output.offset).c_str());
 
                 break;
             }
             case sxm::ceval::Instr_Kind::Neg: {
-                std::println("neg {} {}", offset_parse(instr_now.left.offset), offset_parse(instr_now.output.offset));
+                std::printf("neg %s %s\n", offset_parse(instr_now.left.offset).c_str(), offset_parse(instr_now.output.offset).c_str());
 
                 break;
             }
 
             case sxm::ceval::Instr_Kind::Conj: {
-                std::println("conj {} {} {}", offset_parse(instr_now.left.offset), offset_parse(instr_now.right.offset), offset_parse(instr_now.output.offset));
+                std::printf("conj %s %s %s\n", offset_parse(instr_now.left.offset).c_str(), offset_parse(instr_now.right.offset).c_str(), offset_parse(instr_now.output.offset).c_str());
 
                 break;
             }
             case sxm::ceval::Instr_Kind::Disj: {
-                std::println("disj {} {} {}", offset_parse(instr_now.left.offset), offset_parse(instr_now.right.offset), offset_parse(instr_now.output.offset));
+                std::printf("disj %s %s %s\n", offset_parse(instr_now.left.offset).c_str(), offset_parse(instr_now.right.offset).c_str(), offset_parse(instr_now.output.offset).c_str());
 
                 break;
             }
             case sxm::ceval::Instr_Kind::Add: {
-                std::println("add {} {} {}", offset_parse(instr_now.left.offset), offset_parse(instr_now.right.offset), offset_parse(instr_now.output.offset));
+                std::printf("add %s %s %s\n", offset_parse(instr_now.left.offset).c_str(), offset_parse(instr_now.right.offset).c_str(), offset_parse(instr_now.output.offset).c_str());
 
                 break;
             }
             case sxm::ceval::Instr_Kind::Sub: {
-                std::println("sub {} {} {}", offset_parse(instr_now.left.offset), offset_parse(instr_now.right.offset), offset_parse(instr_now.output.offset));
+                std::printf("sub %s %s %s\n", offset_parse(instr_now.left.offset).c_str(), offset_parse(instr_now.right.offset).c_str(), offset_parse(instr_now.output.offset).c_str());
 
                 break;
             }
             case sxm::ceval::Instr_Kind::Mul: {
-                std::println("mul {} {} {}", offset_parse(instr_now.left.offset), offset_parse(instr_now.right.offset), offset_parse(instr_now.output.offset));
+                std::printf("mul %s %s %s\n", offset_parse(instr_now.left.offset).c_str(), offset_parse(instr_now.right.offset).c_str(), offset_parse(instr_now.output.offset).c_str());
 
                 break;
             }
             case sxm::ceval::Instr_Kind::Div: {
-                std::println("div {} {} {}", offset_parse(instr_now.left.offset), offset_parse(instr_now.right.offset), offset_parse(instr_now.output.offset));
+                std::printf("div %s %s %s\n", offset_parse(instr_now.left.offset).c_str(), offset_parse(instr_now.right.offset).c_str(), offset_parse(instr_now.output.offset).c_str());
 
                 break;
             }
             case sxm::ceval::Instr_Kind::Mod: {
-                std::println("mod {} {} {}", offset_parse(instr_now.left.offset), offset_parse(instr_now.right.offset), offset_parse(instr_now.output.offset));
+                std::printf("mod %s %s %s\n", offset_parse(instr_now.left.offset).c_str(), offset_parse(instr_now.right.offset).c_str(), offset_parse(instr_now.output.offset).c_str());
 
                 break;
             }
             case sxm::ceval::Instr_Kind::Pow: {
-                std::println("pow {} {} {}", offset_parse(instr_now.left.offset), offset_parse(instr_now.right.offset), offset_parse(instr_now.output.offset));
+                std::printf("pow %s %s %s\n", offset_parse(instr_now.left.offset).c_str(), offset_parse(instr_now.right.offset).c_str(), offset_parse(instr_now.output.offset).c_str());
 
                 break;
             }
             case sxm::ceval::Instr_Kind::Eq: {
-                std::println("eq {} {} {}", offset_parse(instr_now.left.offset), offset_parse(instr_now.right.offset), offset_parse(instr_now.output.offset));
+                std::printf("eq %s %s %s\n", offset_parse(instr_now.left.offset).c_str(), offset_parse(instr_now.right.offset).c_str(), offset_parse(instr_now.output.offset).c_str());
 
                 break;
             }
             case sxm::ceval::Instr_Kind::UEq: {
-                std::println("ueq {} {} {}", offset_parse(instr_now.left.offset), offset_parse(instr_now.right.offset), offset_parse(instr_now.output.offset));
+                std::printf("ueq %s %s %s\n", offset_parse(instr_now.left.offset).c_str(), offset_parse(instr_now.right.offset).c_str(), offset_parse(instr_now.output.offset).c_str());
 
                 break;
             }
             case sxm::ceval::Instr_Kind::GTE: {
-                std::println("gte {} {} {}", offset_parse(instr_now.left.offset), offset_parse(instr_now.right.offset), offset_parse(instr_now.output.offset));
+                std::printf("gte %s %s %s\n", offset_parse(instr_now.left.offset).c_str(), offset_parse(instr_now.right.offset).c_str(), offset_parse(instr_now.output.offset).c_str());
 
                 break;
             }
             case sxm::ceval::Instr_Kind::LTE: {
-                std::println("lte {} {} {}", offset_parse(instr_now.left.offset), offset_parse(instr_now.right.offset), offset_parse(instr_now.output.offset));
+                std::printf("lte %s %s %s\n", offset_parse(instr_now.left.offset).c_str(), offset_parse(instr_now.right.offset).c_str(), offset_parse(instr_now.output.offset).c_str());
 
                 break;
             }
             case sxm::ceval::Instr_Kind::LT: {
-                std::println("lt {} {} {}", offset_parse(instr_now.left.offset), offset_parse(instr_now.right.offset), offset_parse(instr_now.output.offset));
+                std::printf("lt %s %s %s\n", offset_parse(instr_now.left.offset).c_str(), offset_parse(instr_now.right.offset).c_str(), offset_parse(instr_now.output.offset).c_str());
 
                 break;
             }
             case sxm::ceval::Instr_Kind::GT: {
-                std::println("gt {} {} {}", offset_parse(instr_now.left.offset), offset_parse(instr_now.right.offset), offset_parse(instr_now.output.offset));
+                std::printf("gt %s %s %s\n", offset_parse(instr_now.left.offset).c_str(), offset_parse(instr_now.right.offset).c_str(), offset_parse(instr_now.output.offset).c_str());
 
                 break;
             }
             case sxm::ceval::Instr_Kind::Assign: {
-                std::println("ass {} {}", offset_parse(instr_now.right.offset), offset_parse(instr_now.output.offset));
+                std::printf("ass %s %s\n", offset_parse(instr_now.right.offset).c_str(), offset_parse(instr_now.output.offset).c_str());
 
                 break;
             }
