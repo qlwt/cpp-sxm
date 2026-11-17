@@ -42,6 +42,7 @@ The project explores four evaluation strategies:
 
 | Function | Arguments | Description |
 |---|---:|---|
+| `abs` | 1 | absolute value |
 | `trunc`, `floor`, `ceil`, `round` | 1 | Rounding and integer-part operations |
 | `min`, `max` | 1+ | Minimum and maximum |
 | `log` | 2 | Logarithm with a specified base |
